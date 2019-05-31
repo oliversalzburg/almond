@@ -28,7 +28,7 @@ function fractal( x, y, maxIterations, maxRadius ) {
 }
 
 function drawFrame( timestamp, delta ) {
-	const MAX_ITERATIONS = 5;
+	const MAX_ITERATIONS = 15;
 	const SCALE          = 3;
 	const SCALE_DIV2     = SCALE / 2;
 	const SCALE_DIV4     = SCALE / 4;
@@ -41,10 +41,11 @@ function drawFrame( timestamp, delta ) {
 	if( timestamp < ROT_IN_TIME ) {
 		const inTime = Math.min( 0, ( timestamp - ROT_IN_TIME ) / ROT_IN_TIME );
 		rotation = ( ( inTime - 1 ) * inTime * inTime ) * ROT_IN_TIME / 10000;
-	}
-	iterations = iterations + Math.floor( ( timestamp ) / 1000 );
-	if( 20 < iterations ) {
-		iterations = Math.min( 3000, Math.floor( iterations * ( iterations / 10 ) ) );
+	} else {
+		iterations = iterations + Math.floor( ( timestamp - ROT_IN_TIME ) / 400 );
+		if( 50 < iterations ) {
+			iterations = Math.min( 3000, Math.floor( iterations * ( iterations / 30 ) ) );
+		}
 	}
 
 	let y = -1;
