@@ -8,7 +8,7 @@ const height = nodeCanvas.height;
 
 const pixMap = context.createImageData( width, height );
 
-function drawFrame( timestamp ) {
+function drawFrame( timestamp, delta ) {
 	let y = 0;
 	for( let mapIndex = 0; mapIndex < width * height * 4; mapIndex += 4 ) {
 		const x = mapIndex % width;
@@ -16,9 +16,9 @@ function drawFrame( timestamp ) {
 			++y;
 		}
 
-		const componentRed   = ( timestamp >> 3 ) % 256;
-		const componentGreen = ( x + timestamp >> 1 ) % 256;
-		const componentBlue  = ( y + timestamp >> 1 ) % 256;
+		const componentRed   = ( mapIndex - ( timestamp >> 4 ) ) % 256;
+		const componentGreen = ( x ^ y + ( mapIndex >> 1 ) ) % 256;
+		const componentBlue  = ( x ^ y - ( timestamp >> 4 ) ) % 256;
 
 		pixMap.data[ mapIndex + 0 ] = componentRed;
 		pixMap.data[ mapIndex + 1 ] = componentGreen;
@@ -29,10 +29,14 @@ function drawFrame( timestamp ) {
 	context.putImageData( pixMap, 0, 0 );
 }
 
+let previousTimestamp = 0;
 function main( timestamp = 0 ) {
 	window.requestAnimationFrame( main );
 
-	drawFrame( timestamp );
+	const timeDelta = timestamp - previousTimestamp;
+	drawFrame( timestamp, timeDelta );
+
+	previousTimestamp = timestamp;
 }
 
 main();
