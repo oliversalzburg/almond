@@ -3,8 +3,9 @@
 const nodeCanvas = document.getElementById( "main" );
 const context    = nodeCanvas.getContext( "2d" );
 
-const WIDTH  = nodeCanvas.width;
-const HEIGHT = nodeCanvas.height;
+const WIDTH           = nodeCanvas.width;
+const HEIGHT          = nodeCanvas.height;
+const ITERATION_LIMIT = 30;
 
 const pixMap = context.createImageData( WIDTH, HEIGHT );
 
@@ -43,7 +44,7 @@ function drawFrame( timestamp, delta ) {
 		rotation = ( ( inTime - 1 ) * inTime * inTime ) * ROT_IN_TIME / 10000;
 	} else {
 		iterations = iterations + Math.floor( ( timestamp - ROT_IN_TIME ) / 400 );
-		iterations = Math.min( 30, iterations );
+		iterations = Math.min( ITERATION_LIMIT, iterations );
 	}
 
 	let y = -1;
@@ -82,7 +83,7 @@ function drawFrame( timestamp, delta ) {
 	context.font = "12px sans-serif";
 	context.fillText( `${iterations}`, 2, 14 );
 
-	return iterations <= 3000;
+	return iterations <= ITERATION_LIMIT;
 }
 
 let previousTimestamp = 0;
