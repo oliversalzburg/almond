@@ -60,12 +60,12 @@ function drawFrame( timestamp, delta ) {
 		const sin = Math.sin( rotation );
 		const cos = Math.cos( rotation );
 
-		const real      = ( ( x - CENTER_X ) * cos - ( y - CENTER_Y ) * sin ) / WIDTH;
-		const imaginary = ( ( x - CENTER_X ) * sin + ( y - CENTER_Y ) * cos ) / HEIGHT;
+		const real      = ( ( x - CENTER_X ) * cos - ( y - CENTER_Y ) * sin ) / WIDTH + 0.5;
+		const imaginary = ( ( x - CENTER_X ) * sin + ( y - CENTER_Y ) * cos ) / HEIGHT + 0.5;
 
 		const r = fractal(
-				( real + 0.5 ) * SCALE - SCALE_DIV2 - SCALE_DIV4,
-				( imaginary + 0.5 ) * SCALE - SCALE_DIV2,
+				real * SCALE - SCALE_DIV2 - SCALE_DIV4,
+				( imaginary + Math.sin( x / 100 ) * rotation * 0.15 ) * SCALE - SCALE_DIV2,
 				iterations,
 				Math.min( Math.log( ( timestamp + 2000 ) / 3000 ), 10 )
 			) / iterations * 255;
