@@ -28,13 +28,24 @@ function fractal( x, y, maxIterations, maxRadius ) {
 }
 
 function drawFrame( timestamp, delta ) {
-	const MAX_ITERATIONS = 15;
+	const MAX_ITERATIONS = 5;
 	const SCALE          = 3;
 	const SCALE_DIV2     = SCALE / 2;
 	const SCALE_DIV4     = SCALE / 4;
 	const CENTER_X       = WIDTH / 2;
 	const CENTER_Y       = HEIGHT / 2;
 	const ROT_IN_TIME    = 6 * 1000;
+
+	let rotation   = 0;
+	let iterations = MAX_ITERATIONS;
+	if( timestamp < ROT_IN_TIME ) {
+		const inTime = Math.min( 0, ( timestamp - ROT_IN_TIME ) / ROT_IN_TIME );
+		rotation = ( ( inTime - 1 ) * inTime * inTime ) * ROT_IN_TIME / 10000;
+	}
+	iterations = iterations + Math.floor( ( timestamp ) / 1000 );
+	if( 20 < iterations ) {
+		iterations = Math.min( 3000, Math.floor( iterations * ( iterations / 10 ) ) );
+	}
 
 	let y = -1;
 	for( let mapIndex = 0, x = 0; mapIndex < WIDTH * HEIGHT * 4; mapIndex += 4, ++x ) {
@@ -45,10 +56,8 @@ function drawFrame( timestamp, delta ) {
 			++y;
 		}
 
-		const inTime     = Math.min( 0, ( timestamp - ROT_IN_TIME ) / ROT_IN_TIME );
-		const inTimeEase = ( ( inTime - 1 ) * inTime * inTime ) * ROT_IN_TIME;
-		const sin        = Math.sin( inTimeEase / 10000 );
-		const cos        = Math.cos( inTimeEase / 10000 );
+		const sin = Math.sin( rotation );
+		const cos = Math.cos( rotation );
 
 		const real      = ( ( x - CENTER_X ) * cos - ( y - CENTER_Y ) * sin ) / WIDTH;
 		const imaginary = ( ( x - CENTER_X ) * sin + ( y - CENTER_Y ) * cos ) / HEIGHT;
@@ -56,9 +65,9 @@ function drawFrame( timestamp, delta ) {
 		const r = fractal(
 				( real + 0.5 ) * SCALE - SCALE_DIV2 - SCALE_DIV4,
 				( imaginary + 0.5 ) * SCALE - SCALE_DIV2,
-				MAX_ITERATIONS,
+				iterations,
 				Math.min( Math.log( ( timestamp + 2000 ) / 3000 ), 10 )
-			) / MAX_ITERATIONS * 255;
+			) / iterations * 255;
 
 		const componentRed   = r;
 		const componentGreen = r;
@@ -71,6 +80,8 @@ function drawFrame( timestamp, delta ) {
 	}
 
 	context.putImageData( pixMap, 0, 0 );
+	context.font = "12px sans-serif";
+	context.fillText( `${iterations}`, 2, 14 );
 }
 
 let previousTimestamp = 0;
