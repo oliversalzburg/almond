@@ -8,17 +8,44 @@ const height = nodeCanvas.height;
 
 const pixMap = context.createImageData( width, height );
 
+function fractal( x, y, maxIterations, maxRadius ) {
+	let real      = x;
+	let imaginary = y;
+
+	while( --maxIterations ) {
+		const tempReal      = real * real - imaginary * imaginary + x;
+		const tempImaginary = 2 * real * imaginary + y;
+
+		if( maxRadius < tempReal * tempImaginary ) {
+			return maxIterations;
+		}
+
+		real      = tempReal;
+		imaginary = tempImaginary;
+	}
+
+	return 0;
+}
+
 function drawFrame( timestamp, delta ) {
-	let y = 0;
-	for( let mapIndex = 0; mapIndex < width * height * 4; mapIndex += 4 ) {
-		const x = mapIndex % width;
+	let y = -1;
+
+	for( let mapIndex = 0, x = 0; mapIndex < width * height * 4; mapIndex += 4, ++x ) {
+		if( x === width ) {
+			x = 0;
+		}
 		if( x === 0 ) {
 			++y;
 		}
 
-		const componentRed   = ( mapIndex - ( timestamp >> 4 ) ) % 256;
-		const componentGreen = ( x ^ y + ( mapIndex >> 1 ) ) % 256;
-		const componentBlue  = ( x ^ y - ( timestamp >> 4 ) ) % 256;
+		const real      = x / width;
+		const imaginary = y / height;
+
+		const r = fractal( ( real * 2 ) - 1.5, ( imaginary * 2 ) - 1, 255, 50 );
+
+		const componentRed   = r;
+		const componentGreen = r;
+		const componentBlue  = r;
 
 		pixMap.data[ mapIndex + 0 ] = componentRed;
 		pixMap.data[ mapIndex + 1 ] = componentGreen;
