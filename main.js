@@ -34,7 +34,7 @@ function drawFrame( timestamp, delta ) {
 	const SCALE_DIV4     = SCALE / 4;
 	const CENTER_X       = WIDTH / 2;
 	const CENTER_Y       = HEIGHT / 2;
-	const ROT_IN_TIME    = 6 * 1000;
+	const ROT_IN_TIME    = 15 * 1000;
 
 	let rotation   = 0;
 	let iterations = MAX_ITERATIONS;
@@ -43,9 +43,7 @@ function drawFrame( timestamp, delta ) {
 		rotation = ( ( inTime - 1 ) * inTime * inTime ) * ROT_IN_TIME / 10000;
 	} else {
 		iterations = iterations + Math.floor( ( timestamp - ROT_IN_TIME ) / 400 );
-		if( 50 < iterations ) {
-			iterations = Math.min( 3000, Math.floor( iterations * ( iterations / 30 ) ) );
-		}
+		iterations = Math.min( 30, iterations );
 	}
 
 	let y = -1;
@@ -67,7 +65,7 @@ function drawFrame( timestamp, delta ) {
 				real * SCALE - SCALE_DIV2 - SCALE_DIV4,
 				( imaginary + Math.sin( x / 100 ) * rotation * 0.15 ) * SCALE - SCALE_DIV2,
 				iterations,
-				Math.min( Math.log( ( timestamp + 2000 ) / 3000 ), 10 )
+				Math.min( Math.log( ( timestamp  ) / 10000 ), WIDTH )
 			) / iterations * 255;
 
 		const componentRed   = r;
@@ -83,14 +81,16 @@ function drawFrame( timestamp, delta ) {
 	context.putImageData( pixMap, 0, 0 );
 	context.font = "12px sans-serif";
 	context.fillText( `${iterations}`, 2, 14 );
+
+	return iterations <= 3000;
 }
 
 let previousTimestamp = 0;
 function main( timestamp = 0 ) {
-	window.requestAnimationFrame( main );
-
 	const timeDelta = timestamp - previousTimestamp;
-	drawFrame( timestamp, timeDelta );
+	if( drawFrame( timestamp, timeDelta ) ) {
+		window.requestAnimationFrame( main );
+	}
 
 	previousTimestamp = timestamp;
 }
