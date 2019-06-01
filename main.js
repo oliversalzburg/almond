@@ -62,6 +62,8 @@ function drawFrame( timestamp, delta ) {
 		iterations = Math.min( ITERATION_LIMIT, iterations );
 	}
 
+	const radius = Math.min( Math.log( ( timestamp  ) / 10000 ), WIDTH );
+
 	let y = -1;
 	for( let mapIndex = 0, x = 0; mapIndex < WIDTH * HEIGHT * 4; mapIndex += 4, ++x ) {
 		if( x === WIDTH ) {
@@ -81,7 +83,7 @@ function drawFrame( timestamp, delta ) {
 				real * SCALE - SCALE_DIV2 - SCALE_DIV4,
 				( imaginary + Math.sin( x / 100 ) * rotation * 0.15 ) * SCALE - SCALE_DIV2,
 				iterations,
-				Math.min( Math.log( ( timestamp  ) / 10000 ), WIDTH )
+				radius
 			) / iterations * 255;
 
 		const color = useAltRendering ? r : 255 - r;
