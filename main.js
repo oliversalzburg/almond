@@ -3,9 +3,17 @@
 const nodeCanvas = document.getElementById( "main" );
 const context    = nodeCanvas.getContext( "2d" );
 
-const WIDTH           = nodeCanvas.width;
-const HEIGHT          = nodeCanvas.height;
-const ITERATION_LIMIT = 30;
+const WIDTH            = nodeCanvas.width;
+const HEIGHT           = nodeCanvas.height;
+const ITERATION_LIMIT  = 30;
+const MAX_ITERATIONS   = 15;
+const SCALE            = 3;
+const SCALE_DIV2       = SCALE / 2;
+const SCALE_DIV4       = SCALE / 4;
+const CENTER_X         = WIDTH / 2;
+const CENTER_Y         = HEIGHT / 2;
+const ROT_IN_TIME      = 15 * 1000;
+const ROT_IN_TIME_DIV2 = ROT_IN_TIME / 2;
 
 const pixMap = context.createImageData( WIDTH, HEIGHT );
 
@@ -16,8 +24,9 @@ function fractal( x, y, maxIterations, maxRadius ) {
 	while( --maxIterations ) {
 		const tempReal      = real * real - imaginary * imaginary + x;
 		const tempImaginary = 2 * real * imaginary + y;
+		const radius        = tempReal * tempImaginary;
 
-		if( maxRadius < tempReal * tempImaginary ) {
+		if( maxRadius < radius ) {
 			return maxIterations;
 		}
 
@@ -29,13 +38,8 @@ function fractal( x, y, maxIterations, maxRadius ) {
 }
 
 function drawFrame( timestamp, delta ) {
-	const MAX_ITERATIONS = 15;
-	const SCALE          = 3;
-	const SCALE_DIV2     = SCALE / 2;
-	const SCALE_DIV4     = SCALE / 4;
-	const CENTER_X       = WIDTH / 2;
-	const CENTER_Y       = HEIGHT / 2;
-	const ROT_IN_TIME    = 15 * 1000;
+	const bg = Math.max( 0, ( ( timestamp - ROT_IN_TIME_DIV2 ) / ROT_IN_TIME * 255 ) );
+	document.body.style.background = `rgb(${bg},${bg},${bg})`;
 
 	let rotation   = 0;
 	let iterations = MAX_ITERATIONS;
@@ -69,9 +73,11 @@ function drawFrame( timestamp, delta ) {
 				Math.min( Math.log( ( timestamp  ) / 10000 ), WIDTH )
 			) / iterations * 255;
 
-		const componentRed   = r;
-		const componentGreen = r;
-		const componentBlue  = r;
+		const color = r - Math.max( 0, ( ( ROT_IN_TIME_DIV2 - timestamp ) / ROT_IN_TIME_DIV2 * 255 ) );
+
+		const componentRed   = color;
+		const componentGreen = color;
+		const componentBlue  = color;
 
 		pixMap.data[ mapIndex + 0 ] = componentRed;
 		pixMap.data[ mapIndex + 1 ] = componentGreen;
