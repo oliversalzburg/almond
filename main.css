@@ -1,3 +1,7 @@
+body {
+    overflow: hidden;
+}
+
 #main {
     display: block;
     position: absolute;
@@ -8,4 +12,9 @@
     bottom: 0;
 
     filter: drop-shadow(10px 10px 4px rgba(0, 0, 0, 0.5));
+    transition: all 1s;
+}
+
+#main.alt {
+    transform: rotate3d(1, 1, 1, 360deg);
 }

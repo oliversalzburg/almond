@@ -3,6 +3,17 @@
 const nodeCanvas = document.getElementById( "main" );
 const context    = nodeCanvas.getContext( "2d" );
 
+let useAltRendering = false;
+nodeCanvas.addEventListener( "click", () => {
+	if( nodeCanvas.classList.contains( "alt" ) ) {
+		nodeCanvas.classList.remove( "alt" );
+		setTimeout( () => useAltRendering = false, 400 );
+	} else {
+		nodeCanvas.classList.add( "alt" );
+		setTimeout( () => useAltRendering = true, 400 );
+	}
+} );
+
 const WIDTH            = nodeCanvas.width;
 const HEIGHT           = nodeCanvas.height;
 const ITERATION_LIMIT  = 30;
@@ -16,8 +27,6 @@ const ROT_IN_TIME      = 15 * 1000;
 const ROT_IN_TIME_DIV2 = ROT_IN_TIME / 2;
 
 const pixMap = context.createImageData( WIDTH, HEIGHT );
-
-const PALETTE = [ 0x3a242b, 0x3b2426, 0x352325, 0x836454, 0x7d5533, 0x8b7352, 0xb1a181, 0xa4632e, 0xbb6b33, 0xb47249, 0xca7239, 0xd29057, 0xe0b87e, 0xd9b166, 0xf5eabe, 0xfcfadf, 0xd9d1b0, 0xfcfadf, 0xd1d1ca, 0xa7b1ac, 0x879a8c, 0x9186ad, 0x776a8e, 0x000022, 0x000022, 0x000022, 0x000022, 0x000022, 0x000022, 0x000022, 0x000022, 0x000022, 0x000022 ].reverse();
 
 function fractal( x, y, maxIterations, maxRadius ) {
 	let real      = x;
@@ -75,12 +84,12 @@ function drawFrame( timestamp, delta ) {
 				Math.min( Math.log( ( timestamp  ) / 10000 ), WIDTH )
 			) / iterations * 255;
 
-		const color = PALETTE[ Math.floor( r / 255 * PALETTE.length ) ];
+		const color = useAltRendering ? r : 255 - r;
 		const fade  = Math.max( 0, ( ( ROT_IN_TIME_DIV2 - timestamp ) / ROT_IN_TIME_DIV2 * 255 ) );
 
-		const componentRed   = color >> 16 & 0xff;
-		const componentGreen = color >> 8 & 0xff;
-		const componentBlue  = color & 0xff;
+		const componentRed   = color;
+		const componentGreen = color;
+		const componentBlue  = color;
 
 		pixMap.data[ mapIndex + 0 ] = componentRed - fade;
 		pixMap.data[ mapIndex + 1 ] = componentGreen - fade;
